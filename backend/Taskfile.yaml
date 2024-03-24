@@ -14,4 +14,25 @@ tasks:
   test-light:
     desc: "Run lighter tests"
     cmds:
-      - go test -v ./... -short
+      - gotestsum -f pkgname -- -short ./...
+
+  test-all:
+    desc: "Run entire tests"
+    cmds:
+      - gotestsum -f pkgname
+
+  watch-tests:
+    desc: "Watch tests"
+    cmds:
+      - gotestsum --watch -f pkgname
+
+  flag-heavy-tests:
+    desc: "Flag a Heavy test with short so that we can skip if necessary"
+    cmds:
+      - go test -json -short ./... | gotestsum tool slowest --skip-stmt "testing.Short" --threshold 200ms
+
+  coverage:
+    desc: "Test coverage output to coverage.html"
+    cmds:
+      - gotestsum -f pkgname -- -coverprofile=c.out ./...
+      - go tool cover -html=c.out -o coverage.html
