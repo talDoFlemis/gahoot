@@ -14,9 +14,11 @@ import (
 )
 
 var (
-	ErrFailedToSignToken = errors.New("token sign failed")
-	ErrUserNotFound      = errors.New("user not found")
-	ErrInvalidPassword   = errors.New("invalid password")
+	ErrFailedToSignToken   = errors.New("token sign failed")
+	ErrUserNotFound        = errors.New("user not found")
+	ErrInvalidPassword     = errors.New("invalid password")
+	ErrExpiredToken        = errors.New("token expired")
+	ErrInvalidRefreshToken = errors.New("invalid refresh token")
 )
 
 const (
@@ -125,10 +127,16 @@ func (i *localIDP) RefreshToken(
 		func(token *jwt.Token) (interface{}, error) {
 			return i.cfg.publicKey, nil
 		},
+		jwt.WithAudience(i.cfg.audience),
+		jwt.WithIssuer(i.cfg.issuer),
+		jwt.WithExpirationRequired(),
 	)
 	if err != nil {
 		i.logger.Error("Failed to parse refresh token", err)
-		return nil, err
+		if errors.Is(err, jwt.ErrTokenExpired) {
+			return nil, ErrExpiredToken
+		}
+		return nil, ErrInvalidRefreshToken
 	}
 	claims := token.Claims.(*jwt.RegisteredClaims)
 
@@ -151,7 +159,7 @@ func (i *localIDP) AuthenticateUser(
 	username string,
 	password string,
 ) (*ports.UserIdentityInfo, error) {
-	user, err := i.repo.FindUserById(ctx, username)
+	user, err := i.repo.FindUserByUsername(ctx, username)
 	if err != nil {
 		i.logger.Error("Failed to find user", err)
 		return nil, err
