@@ -76,7 +76,7 @@ func (suite *LocalIDPPostgresStorerTestSuite) TestFindUserById() {
 	t := suite.T()
 
 	// Act
-	user, err := suite.repo.FindUserById(suite.ctx, "f7396104-a636-4826-9d9f-b92ae90cea14")
+	user, err := suite.repo.FindUserByUsername(suite.ctx, "gepeto")
 
 	// Assert
 	assert.NoError(t, err)
@@ -91,7 +91,7 @@ func (suite *LocalIDPPostgresStorerTestSuite) TestTryToFindUserByIdThatDoesNotEx
 	random := "7ebc4755-b7cc-4963-a2b1-636949b035d6"
 
 	// Act
-	user, err := suite.repo.FindUserById(suite.ctx, random)
+	user, err := suite.repo.FindUserByUsername(suite.ctx, random)
 
 	// Assert
 	assert.Nil(t, user)

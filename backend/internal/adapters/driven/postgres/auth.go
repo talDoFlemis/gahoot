@@ -33,7 +33,7 @@ func (s *LocalIDPPostgresStorer) StoreUser(
 ) (*ports.LocalIDPUserEntity, error) {
 	id := uuid.New()
 	args := pgx.NamedArgs{
-		"id":       id,
+		"id":       id.String(),
 		"username": username,
 		"email":    email,
 		"password": password,
@@ -101,15 +101,15 @@ func (s *LocalIDPPostgresStorer) DeleteUser(ctx context.Context, userId string) 
 	return nil
 }
 
-func (s *LocalIDPPostgresStorer) FindUserById(
+func (s *LocalIDPPostgresStorer) FindUserByUsername(
 	ctx context.Context,
-	userId string,
+	username string,
 ) (*ports.LocalIDPUserEntity, error) {
 	args := pgx.NamedArgs{
-		"id": userId,
+		"username": username,
 	}
 
-	query := `SELECT id, username, email, password FROM users WHERE id = @id`
+	query := `SELECT id, username, email, password FROM users WHERE username = @username`
 
 	var user ports.LocalIDPUserEntity
 

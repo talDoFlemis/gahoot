@@ -6,15 +6,15 @@ import (
 )
 
 type TokenResponse struct {
-	AccessToken  string    `json:"access_token"`
-	RefreshToken string    `json:"refresh_token"`
-	ExpiresAt    time.Time `json:"expires_at"`
+	AccessToken  string
+	RefreshToken string
+	ExpiresAt    time.Time
 }
 
 type UserIdentityInfo struct {
-	ID       string `json:"id"`
-	Username string `json:"username"`
-	Email    string `json:"email"`
+	ID       string
+	Username string
+	Email    string
 }
 
 type AuthenticationManager interface {
@@ -46,5 +46,5 @@ type LocalIDPStorer interface {
 		userId, username, password, email string,
 	) (*LocalIDPUserEntity, error)
 	DeleteUser(ctx context.Context, userId string) error
-	FindUserById(ctx context.Context, userId string) (*LocalIDPUserEntity, error)
+	FindUserByUsername(ctx context.Context, username string) (*LocalIDPUserEntity, error)
 }
