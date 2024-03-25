@@ -8,7 +8,7 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"github.com/taldoflemis/brain.test/internal/adapters/driven/auth"
+	"github.com/taldoflemis/brain.test/internal/ports"
 )
 
 var (
@@ -30,7 +30,7 @@ func (s *LocalIDPPostgresStorer) StoreUser(
 	username string,
 	email string,
 	password string,
-) (*auth.LocalIDPUserEntity, error) {
+) (*ports.LocalIDPUserEntity, error) {
 	id := uuid.New()
 	args := pgx.NamedArgs{
 		"id":       id,
@@ -44,7 +44,7 @@ func (s *LocalIDPPostgresStorer) StoreUser(
 		return nil, err
 	}
 
-	return &auth.LocalIDPUserEntity{
+	return &ports.LocalIDPUserEntity{
 		ID:             id.String(),
 		Username:       username,
 		HashedPassword: password,
@@ -58,7 +58,7 @@ func (s *LocalIDPPostgresStorer) UpdateUser(
 	username string,
 	password string,
 	email string,
-) (*auth.LocalIDPUserEntity, error) {
+) (*ports.LocalIDPUserEntity, error) {
 	args := pgx.NamedArgs{
 		"id":       userId,
 		"username": username,
@@ -76,7 +76,7 @@ func (s *LocalIDPPostgresStorer) UpdateUser(
 		return nil, ErrUserNotFound
 	}
 
-	return &auth.LocalIDPUserEntity{
+	return &ports.LocalIDPUserEntity{
 		ID:             userId,
 		Username:       username,
 		Email:          email,
@@ -104,14 +104,14 @@ func (s *LocalIDPPostgresStorer) DeleteUser(ctx context.Context, userId string) 
 func (s *LocalIDPPostgresStorer) FindUserById(
 	ctx context.Context,
 	userId string,
-) (*auth.LocalIDPUserEntity, error) {
+) (*ports.LocalIDPUserEntity, error) {
 	args := pgx.NamedArgs{
 		"id": userId,
 	}
 
 	query := `SELECT id, username, email, password FROM users WHERE id = @id`
 
-	var user auth.LocalIDPUserEntity
+	var user ports.LocalIDPUserEntity
 
 	err := s.pool.QueryRow(ctx, query, args).
 		Scan(&user.ID, &user.Username, &user.Email, &user.HashedPassword)

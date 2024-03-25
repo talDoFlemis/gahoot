@@ -23,26 +23,6 @@ const (
 	defaultBCryptCost = 12
 )
 
-type LocalIDPUserEntity struct {
-	ID             string
-	Username       string
-	Email          string
-	HashedPassword string
-}
-
-type LocalIDPStorer interface {
-	StoreUser(
-		ctx context.Context,
-		username, email, password string,
-	) (*LocalIDPUserEntity, error)
-	UpdateUser(
-		ctx context.Context,
-		userId, username, password, email string,
-	) (*LocalIDPUserEntity, error)
-	DeleteUser(ctx context.Context, userId string) error
-	FindUserById(ctx context.Context, userId string) (*LocalIDPUserEntity, error)
-}
-
 type LocalIdpConfig struct {
 	privateKey         ed25519.PrivateKey
 	publicKey          crypto.PublicKey
@@ -71,10 +51,10 @@ func NewLocalIdpConfig(
 type localIDP struct {
 	cfg    LocalIdpConfig
 	logger ports.Logger
-	repo   LocalIDPStorer
+	repo   ports.LocalIDPStorer
 }
 
-func NewLocalIdp(cfg LocalIdpConfig, logger ports.Logger, repo LocalIDPStorer) *localIDP {
+func NewLocalIdp(cfg LocalIdpConfig, logger ports.Logger, repo ports.LocalIDPStorer) *localIDP {
 	return &localIDP{
 		cfg:    cfg,
 		logger: logger,
